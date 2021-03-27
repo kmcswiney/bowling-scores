@@ -106,8 +106,11 @@ class BowlingGame:
     def _last_frame(self):
         return self._frames[-1]
 
+    def _tenth_frame(self):
+        return self._frame_or_none(9)
+
     def _completed_ten_frames(self):
-        tenth_frame = self._frame_or_none(9)
+        tenth_frame = self._tenth_frame()
         return tenth_frame is not None and tenth_frame.is_complete()
 
     def _frame_or_none(self, index):
