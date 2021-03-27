@@ -46,28 +46,33 @@ class BowlingGame:
             return frame.total_pins()
 
     def _compute_spare_score(self, frame_num, frame):
-        following_frame = self._get_frame(frame_num + 1)
-        if following_frame:
-            return frame.total_pins() + following_frame.rolls[0]
+        following_roll = self._next_rolls(frame_num, 1)
+        if following_roll:
+            return frame.total_pins() + sum(following_roll)
         else:
             return 0
 
     def _compute_strike_score(self, frame_num, frame):
-        following_frames = self.frames[frame_num + 1:]
-        following_rolls = [roll for frame in following_frames for roll in frame.rolls]
-        if len(following_rolls) >= 2:
-            return frame.total_pins() + sum(following_rolls[:2])
+        following_2_rolls = self._next_rolls(frame_num, 2)
+        if following_2_rolls:
+            return frame.total_pins() + sum(following_2_rolls)
         else:
             return 0
 
+    def _next_rolls(self, frame_num, num_rolls):
+        """ 
+        Given a frame index number, return the following num_rolls rolls that occurred after the given frame.
+        If the specified number of rolls have not occurred yet, return None.
+        """
+        following_frames = self.frames[frame_num + 1:]
+        rolls = [roll for frame in following_frames for roll in frame.rolls]
+        if len(rolls) >= num_rolls:
+            return rolls[:num_rolls]
+        else:
+            return None
+
     def _previous_frame(self):
         return self.frames[-1]
-
-    def _get_frame(self, frame_num):
-        try:
-            return self.frames[frame_num]
-        except IndexError:
-            return None
 
     def _is_first_roll(self):
         return not self.frames
