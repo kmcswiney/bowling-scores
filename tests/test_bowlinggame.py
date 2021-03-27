@@ -26,3 +26,11 @@ class TestBowlingGame(TestCase):
         self.roll([5, 2, 1, 4, 7])
         self.assertEqual(self.game.score(), 12)
 
+    def test_spare(self):
+        self.roll([4, 6, 5, 0])
+        self.assertEqual(
+            self.game.score(), 18,
+            msg="The score for a spare should be the number of pins knocked down in the spare frame"
+                "plus the number of pins knocked down in the following roll"
+        )
+
