@@ -33,15 +33,18 @@ class BowlingGame:
         self._frames = []
 
     def roll(self, pins):
-        if not self._game_finished():
-            if self._is_first_roll() or self._previous_frame().is_complete():
+        if not self._all_frames_finished():
+            if self._is_first_roll() or self._last_frame().is_complete():
                 self._frames.append(Frame(rolls=[pins]))
             else:
-                self._previous_frame().rolls.append(pins)
+                self._last_frame().rolls.append(pins)
         else:
-            raise GameFinishedException("The game is finished, you cannot make any more rolls.")
+            if self._tenth_frame().is_spare() and len(self._frames) == 10:
+                self._frames.append(Frame(rolls=[pins]))
+            else:
+                raise GameFinishedException("The game is finished, you cannot make any more rolls.")
 
-    def _game_finished(self):
+    def _all_frames_finished(self):
         return len([f for f in self._frames if f.is_complete()]) == self.FRAMES_PER_MATCH
 
     def score(self):
@@ -84,8 +87,11 @@ class BowlingGame:
         else:
             return None
 
-    def _previous_frame(self):
+    def _last_frame(self):
         return self._frames[-1]
+
+    def _tenth_frame(self):
+        return self._frames[9]
 
     def _is_first_roll(self):
         return not self._frames
