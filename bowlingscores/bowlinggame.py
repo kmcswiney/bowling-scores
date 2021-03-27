@@ -33,22 +33,26 @@ class BowlingGame:
         self._frames = []
 
     def roll(self, pins):
-        if not self._all_frames_finished():
-            if self._is_first_roll() or self._last_frame().is_complete():
-                self._frames.append(Frame(rolls=[pins]))
-            else:
-                self._last_frame().rolls.append(pins)
+        if self._roll_permitted():
+            self._apply_roll(pins)
         else:
-            if self._tenth_frame().is_spare() and len(self._frames) == 10:
-                self._frames.append(Frame(rolls=[pins]))
-            else:
-                raise GameFinishedException("The game is finished, you cannot make any more rolls.")
+            raise GameFinishedException("The game is finished, you cannot make any more rolls.")
+    
+    def _roll_permitted(self):
+        return (
+            (self._tenth_frame() is None or not self._tenth_frame().is_complete()) or
+            (self._tenth_frame().is_spare() and self._bonus_frame() is None) or
+            (self._tenth_frame().is_strike() and len(self._frames) <= 11)
+        )
 
-    def _all_frames_finished(self):
-        return len([f for f in self._frames if f.is_complete()]) == self.FRAMES_PER_MATCH
+    def _apply_roll(self, pins):
+        if self._is_first_roll() or self._last_frame().is_complete():
+            self._frames.append(Frame(rolls=[pins]))
+        else:
+            self._last_frame().rolls.append(pins)
 
     def score(self):
-        return sum(self._compute_frame_score(frame_index, frame) for frame_index, frame in enumerate(self._frames))
+        return sum(self._compute_frame_score(frame_index, frame) for frame_index, frame in enumerate(self._frames[:self.FRAMES_PER_MATCH]))
 
     def _compute_frame_score(self, frame_index, frame):
         return self._compute_completed_frame_score(frame_index, frame) if frame.is_complete() else 0
@@ -91,7 +95,16 @@ class BowlingGame:
         return self._frames[-1]
 
     def _tenth_frame(self):
-        return self._frames[9]
+        return self._frame_or_none(9)
+
+    def _bonus_frame(self):
+        return self._frame_or_none(10)
+
+    def _frame_or_none(self, index):
+        try:
+            return self._frames[index]
+        except IndexError:
+            return None
 
     def _is_first_roll(self):
         return not self._frames
