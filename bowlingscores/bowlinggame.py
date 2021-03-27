@@ -10,7 +10,6 @@ class Frame:
 
     def score(self):
         return sum(self.rolls)
-    
 
 class BowlingGame:
 

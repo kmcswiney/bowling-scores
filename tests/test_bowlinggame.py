@@ -18,3 +18,11 @@ class TestBowlingGame(TestCase):
         self.game.roll(5)
         self.game.roll(2)
         self.assertEqual(self.game.score(), 7, msg="Score should be incremented once frame complete")
+
+    def test_multiple_frames(self):
+        self.game.roll(5)
+        self.game.roll(2)
+        self.game.roll(1)
+        self.game.roll(4)
+        self.game.roll(7)
+        self.assertEqual(self.game.score(), 12)
