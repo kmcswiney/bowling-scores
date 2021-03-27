@@ -34,9 +34,9 @@ class TestBowlingGame(TestCase):
                 "plus the number of pins knocked down in the following roll"
         )
 
-    def test_spare_doesnt_affect_score_until_following_bowl(self):
-        self.roll([4, 6])
-        self.assertEqual(self.game.score(), 0)
+    def test_spare_score_not_applied_until_following_roll(self):
+        self.roll([3, 5, 4, 6])
+        self.assertEqual(self.game.score(), 8)
 
     def test_strike(self):
         self.roll([10, 5, 4])
@@ -44,4 +44,47 @@ class TestBowlingGame(TestCase):
             self.game.score(), 28,
             msg="The score for a strike should be the number of pins knocked down in the strike frame "
                 "plus the number of pins knocked down in the next two rolls"
+        )
+
+    def test_strike_score_not_applied_until_following_2_rolls(self):
+        self.roll([3, 5, 10, 5])
+        self.assertEqual(self.game.score(), 8)
+
+    def test_multiple_spares(self):
+        self.roll([6, 4, 7, 3, 3, 2])
+        self.assertEqual(self.game.score(), (6 + 4 + 7) + (7 + 3 + 3) + 3 + 2)
+
+    def test_multiple_strikes(self):
+        self.roll([10, 10, 7, 2])
+        self.assertEqual(self.game.score(), (10 + 10 + 7) + (10 + 7 + 2) + (7 + 2))
+
+    def test_full_game(self):
+        self.roll(
+            [
+                5, 3,
+                10,
+                4, 4,
+                7, 3,
+                2, 5,
+                8, 1,
+                6, 3,
+                3, 5,
+                2, 6,
+                6, 3
+            ]
+        )
+        self.assertEqual(
+            self.game.score(),
+            (
+                (5 + 3) +
+                (10 + 4 + 4) +
+                (4 + 4) + 
+                (7 + 3 + 2) +
+                (2 + 5) +
+                (8 + 1) +
+                (6 + 3) +
+                (3 + 5) +
+                (2 + 6) +
+                (6 + 3)
+            )
         )
