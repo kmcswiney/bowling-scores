@@ -65,23 +65,17 @@ class BowlingGame:
         else:
             return frame.total_pins()
 
-    def _compute_frame_plus_following(self, frame_index, frame, num_following):
-        following_rolls = self._next_rolls(frame_index, num_following)
-        if following_rolls:
+    def _compute_frame_plus_following(self, frame_index, frame, num_following_rolls):
+        """ 
+        Given a frame, return the pins knocked down in that frame plus
+        the number of pins knocked down in the subsequent num_following_rolls rolls.
+        If the following rolls have not occurred yet, return zero.
+        """
+        following_rolls = self._rolls_since(frame_index)[:num_following_rolls]
+        if len(following_rolls) == num_following_rolls:
             return frame.total_pins() + sum(following_rolls)
         else:
             return 0
-
-    def _next_rolls(self, frame_index, num_rolls):
-        """ 
-        Given a frame index number, return the following num_rolls rolls that occurred after the given frame.
-        If the specified number of rolls have not occurred yet, return None.
-        """
-        rolls = self._rolls_since(frame_index)
-        if len(rolls) >= num_rolls:
-            return rolls[:num_rolls]
-        else:
-            return None
 
     def _rolls_since(self, frame_index):
         """
