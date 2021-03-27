@@ -6,13 +6,19 @@ class Frame:
     rolls: list
 
     def is_complete(self):
-        return len(self.rolls) == 2 or self.total_pins == 10
+        return len(self.rolls) == 2 or self.all_pins_knocked_down()
 
     def total_pins(self):
         return sum(self.rolls)
 
     def is_spare(self):
-        return sum(self.rolls) == 10
+        return len(self.rolls) == 2 and self.all_pins_knocked_down()
+
+    def is_strike(self):
+        return len(self.rolls) == 1 and self.all_pins_knocked_down()
+
+    def all_pins_knocked_down(self):
+        return self.total_pins() == 10
 
 class BowlingGame:
 
@@ -34,6 +40,8 @@ class BowlingGame:
     def _compute_completed_frame_score(self, frame_num, frame):
         if frame.is_spare():
             return self._compute_spare_score(frame_num, frame)
+        elif frame.is_strike():
+            return self._compute_strike_score(frame_num, frame)
         else:
             return frame.total_pins()
 
@@ -44,6 +52,13 @@ class BowlingGame:
         else:
             return 0
 
+    def _compute_strike_score(self, frame_num, frame):
+        following_frames = self.frames[frame_num + 1:]
+        following_rolls = [roll for frame in following_frames for roll in frame.rolls]
+        if len(following_rolls) >= 2:
+            return frame.total_pins() + sum(following_rolls[:2])
+        else:
+            return 0
 
     def _previous_frame(self):
         return self.frames[-1]

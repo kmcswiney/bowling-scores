@@ -30,7 +30,18 @@ class TestBowlingGame(TestCase):
         self.roll([4, 6, 5, 0])
         self.assertEqual(
             self.game.score(), 20,
-            msg="The score for a spare should be the number of pins knocked down in the spare frame"
+            msg="The score for a spare should be the number of pins knocked down in the spare frame "
                 "plus the number of pins knocked down in the following roll"
         )
 
+    def test_spare_doesnt_affect_score_until_following_bowl(self):
+        self.roll([4, 6])
+        self.assertEqual(self.game.score(), 0)
+
+    def test_strike(self):
+        self.roll([10, 5, 4])
+        self.assertEqual(
+            self.game.score(), 28,
+            msg="The score for a strike should be the number of pins knocked down in the strike frame "
+                "plus the number of pins knocked down in the next two rolls"
+        )
