@@ -19,8 +19,8 @@ class TestBowlingGame(TestCase):
         self.assertEqual(self.game.score(), 0, msg="Score should not increment until frame is complete")
 
     def test_first_frame_complete(self):
-        self.roll([5, 2])
-        self.assertEqual(self.game.score(), 7, msg="Score should be incremented once frame complete")
+        self.roll([4, 4])
+        self.assertEqual(self.game.score(), 8, msg="Score should be incremented once frame complete")
 
     def test_multiple_frames(self):
         self.roll([5, 2, 1, 4, 7])
