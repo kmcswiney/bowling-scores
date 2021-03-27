@@ -6,9 +6,9 @@ class Frame:
     rolls: list
 
     def is_complete(self):
-        return len(self.rolls) == 2 or self.score == 10
+        return len(self.rolls) == 2 or self.total_pins == 10
 
-    def score(self):
+    def total_pins(self):
         return sum(self.rolls)
 
     def is_spare(self):
@@ -32,9 +32,9 @@ class BowlingGame:
                 if frame.is_spare():
                     following_frame = self._get_frame(index + 1)
                     if following_frame:
-                        frame_score = frame.score() + following_frame.rolls[0]
+                        frame_score = frame.total_pins() + following_frame.rolls[0]
                 else:
-                    frame_score = frame.score()
+                    frame_score = frame.total_pins()
                 score += frame_score
         return score
 
