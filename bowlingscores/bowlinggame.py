@@ -59,23 +59,16 @@ class BowlingGame:
 
     def _compute_completed_frame_score(self, frame_index, frame):
         if frame.is_spare():
-            return self._compute_spare_score(frame_index, frame)
+            return self._compute_frame_plus_following(frame_index, frame, 1)
         elif frame.is_strike():
-            return self._compute_strike_score(frame_index, frame)
+            return self._compute_frame_plus_following(frame_index, frame, 2)
         else:
             return frame.total_pins()
 
-    def _compute_spare_score(self, frame_index, frame):
-        following_roll = self._next_rolls(frame_index, 1)
-        if following_roll:
-            return frame.total_pins() + sum(following_roll)
-        else:
-            return 0
-
-    def _compute_strike_score(self, frame_index, frame):
-        following_2_rolls = self._next_rolls(frame_index, 2)
-        if following_2_rolls:
-            return frame.total_pins() + sum(following_2_rolls)
+    def _compute_frame_plus_following(self, frame_index, frame, num_following):
+        following_rolls = self._next_rolls(frame_index, num_following)
+        if following_rolls:
+            return frame.total_pins() + sum(following_rolls)
         else:
             return 0
 
