@@ -26,24 +26,31 @@ class BowlingGame:
             self._previous_frame().rolls.append(pins)
 
     def score(self):
-        score = 0
-        for index, frame in enumerate(self.frames):
-            if frame.is_complete():
-                if frame.is_spare():
-                    following_frame = self._get_frame(index + 1)
-                    if following_frame:
-                        frame_score = frame.total_pins() + following_frame.rolls[0]
-                else:
-                    frame_score = frame.total_pins()
-                score += frame_score
-        return score
+        return sum(self._compute_frame_score(frame_num, frame) for frame_num, frame in enumerate(self.frames))
+
+    def _compute_frame_score(self, frame_num, frame):
+        return self._compute_completed_frame_score(frame_num, frame) if frame.is_complete() else 0
+
+    def _compute_completed_frame_score(self, frame_num, frame):
+        if frame.is_spare():
+            return self._compute_spare_score(frame_num, frame)
+        else:
+            return frame.total_pins()
+
+    def _compute_spare_score(self, frame_num, frame):
+        following_frame = self._get_frame(frame_num + 1)
+        if following_frame:
+            return frame.total_pins() + following_frame.rolls[0]
+        else:
+            return 0
+
 
     def _previous_frame(self):
         return self.frames[-1]
 
-    def _get_frame(self, index):
+    def _get_frame(self, frame_num):
         try:
-            return self.frames[index]
+            return self.frames[frame_num]
         except IndexError:
             return None
 
