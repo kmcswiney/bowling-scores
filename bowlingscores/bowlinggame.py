@@ -11,6 +11,9 @@ class Frame:
     def score(self):
         return sum(self.rolls)
 
+    def is_spare(self):
+        return sum(self.rolls) == 10
+
 class BowlingGame:
 
     def __init__(self):
@@ -23,10 +26,26 @@ class BowlingGame:
             self._previous_frame().rolls.append(pins)
 
     def score(self):
-        return sum(frame.score() for frame in self.frames if frame.is_complete())
+        score = 0
+        for index, frame in enumerate(self.frames):
+            if frame.is_complete():
+                if frame.is_spare():
+                    following_frame = self._get_frame(index + 1)
+                    if following_frame:
+                        frame_score = frame.score() + following_frame.rolls[0]
+                else:
+                    frame_score = frame.score()
+                score += frame_score
+        return score
 
     def _previous_frame(self):
         return self.frames[-1]
+
+    def _get_frame(self, index):
+        try:
+            return self.frames[index]
+        except IndexError:
+            return None
 
     def _is_first_roll(self):
         return not self.frames
