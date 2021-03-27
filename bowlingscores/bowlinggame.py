@@ -41,8 +41,8 @@ class BowlingGame:
     def _roll_permitted(self):
         return (
             (not self._completed_ten_frames()) or
-            (self._completed_ten_frames() and self._tenth_frame().is_spare() and len(self._bonus_rolls()) <= 1) or
-            (self._completed_ten_frames() and self._tenth_frame().is_strike() and len(self._bonus_rolls()) <= 2)
+            (self._completed_ten_frames() and self._tenth_frame().is_spare() and len(self._bonus_rolls()) < 1) or
+            (self._completed_ten_frames() and self._tenth_frame().is_strike() and len(self._bonus_rolls()) < 2)
         )
 
     def _apply_roll(self, pins):

@@ -100,6 +100,8 @@ class TestBowlingGame(TestCase):
         self.roll([7, 3])
         self.roll([5])
         self.assertEqual(self.game.score(), 18 + (7 + 3 + 5))
+        with self.assertRaises(GameFinishedException):
+            self.roll([7])
 
     def test_bonus_roll_after_last_frame_strike(self):
         eighteen_ones = [1] * 18
@@ -107,9 +109,16 @@ class TestBowlingGame(TestCase):
         self.roll([10])
         self.roll([5, 2])
         self.assertEqual(self.game.score(), 18 + (10 + 5 + 2))
+        with self.assertRaises(GameFinishedException):
+            self.roll([7])
 
     def test_all_strikes(self):
         twelve_strikes = [10] * 12
         self.roll(twelve_strikes)
         self.assertEqual(self.game.score(), 300)
+        with self.assertRaises(GameFinishedException):
+            self.roll([7])
+
+
+
         
