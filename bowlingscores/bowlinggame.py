@@ -40,9 +40,9 @@ class BowlingGame:
     
     def _roll_permitted(self):
         return (
-            (self._tenth_frame() is None or not self._tenth_frame().is_complete()) or
-            (self._tenth_frame().is_spare() and self._bonus_frame() is None) or
-            (self._tenth_frame().is_strike() and len(self._frames) <= 11)
+            (not self._completed_ten_frames()) or
+            (self._completed_ten_frames() and self._tenth_frame().is_spare() and len(self._bonus_rolls()) <= 1) or
+            (self._completed_ten_frames() and self._tenth_frame().is_strike() and len(self._bonus_rolls()) <= 2)
         )
 
     def _apply_roll(self, pins):
@@ -84,12 +84,24 @@ class BowlingGame:
         Given a frame index number, return the following num_rolls rolls that occurred after the given frame.
         If the specified number of rolls have not occurred yet, return None.
         """
-        following_frames = self._frames[frame_index + 1:]
-        rolls = [roll for frame in following_frames for roll in frame.rolls]
+        rolls = self._rolls_since(frame_index)
         if len(rolls) >= num_rolls:
             return rolls[:num_rolls]
         else:
             return None
+
+    def _rolls_since(self, frame_index):
+        """
+        Returns all the rolls that have occurred after the completion of the specified frame.
+        """
+        following_frames = self._frames[frame_index + 1:]
+        return [roll for frame in following_frames for roll in frame.rolls]
+
+    def _bonus_rolls(self):
+        """
+        Return the rolls that have occurred since the completion of the tenth frame.
+        """
+        return self._rolls_since(9)
 
     def _last_frame(self):
         return self._frames[-1]
@@ -97,8 +109,9 @@ class BowlingGame:
     def _tenth_frame(self):
         return self._frame_or_none(9)
 
-    def _bonus_frame(self):
-        return self._frame_or_none(10)
+    def _completed_ten_frames(self):
+        tenth_frame = self._tenth_frame()
+        return tenth_frame is not None and tenth_frame.is_complete()
 
     def _frame_or_none(self, index):
         try:
