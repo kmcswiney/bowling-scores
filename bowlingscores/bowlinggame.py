@@ -52,20 +52,20 @@ class BowlingGame:
             self._last_frame().rolls.append(pins)
 
     def score(self):
-        return sum(self._compute_frame_score(frame_index, frame) for frame_index, frame in enumerate(self._frames[:self.FRAMES_PER_MATCH]))
+        return sum(self._frame_score(frame_index, frame) for frame_index, frame in enumerate(self._frames[:self.FRAMES_PER_MATCH]))
 
-    def _compute_frame_score(self, frame_index, frame):
-        return self._compute_completed_frame_score(frame_index, frame) if frame.is_complete() else 0
+    def _frame_score(self, frame_index, frame):
+        return self._completed_frame_score(frame_index, frame) if frame.is_complete() else 0
 
-    def _compute_completed_frame_score(self, frame_index, frame):
+    def _completed_frame_score(self, frame_index, frame):
         if frame.is_spare():
-            return self._compute_frame_plus_following(frame_index, frame, 1)
+            return self._frame_pins_plus_following(frame_index, frame, 1)
         elif frame.is_strike():
-            return self._compute_frame_plus_following(frame_index, frame, 2)
+            return self._frame_pins_plus_following(frame_index, frame, 2)
         else:
             return frame.total_pins()
 
-    def _compute_frame_plus_following(self, frame_index, frame, num_following_rolls):
+    def _frame_pins_plus_following(self, frame_index, frame, num_following_rolls):
         """ 
         Given a frame, return the pins knocked down in that frame plus
         the number of pins knocked down in the subsequent num_following_rolls rolls.
@@ -79,7 +79,7 @@ class BowlingGame:
 
     def _rolls_since(self, frame_index):
         """
-        Returns all the rolls that have occurred after the completion of the specified frame.
+        Returns all the rolls that have occurred since the completion of the specified frame.
         """
         following_frames = self._frames[frame_index + 1:]
         return [roll for frame in following_frames for roll in frame.rolls]
