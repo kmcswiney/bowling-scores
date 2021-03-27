@@ -107,4 +107,9 @@ class TestBowlingGame(TestCase):
         self.roll([10])
         self.roll([5, 2])
         self.assertEqual(self.game.score(), 18 + (10 + 5 + 2))
+
+    def test_all_strikes(self):
+        ten_strikes = [10] * 10
+        self.roll(ten_strikes)
+        self.assertEqual(self.game.score(), 300)
         
