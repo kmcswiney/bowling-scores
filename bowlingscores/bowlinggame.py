@@ -3,6 +3,8 @@ from dataclasses import dataclass
 @dataclass
 class Frame:
 
+    PINS_PER_FRAME = 10
+
     rolls: list
 
     def is_complete(self):
@@ -18,18 +20,29 @@ class Frame:
         return len(self.rolls) == 1 and self.all_pins_knocked_down()
 
     def all_pins_knocked_down(self):
-        return self.total_pins() == 10
+        return self.total_pins() == self.PINS_PER_FRAME
+
+class GameFinishedException(ValueError):
+    pass
 
 class BowlingGame:
+
+    FRAMES_PER_MATCH = 10
 
     def __init__(self):
         self._frames = []
 
     def roll(self, pins):
-        if self._is_first_roll() or self._previous_frame().is_complete():
-            self._frames.append(Frame(rolls=[pins]))
+        if not self._game_finished():
+            if self._is_first_roll() or self._previous_frame().is_complete():
+                self._frames.append(Frame(rolls=[pins]))
+            else:
+                self._previous_frame().rolls.append(pins)
         else:
-            self._previous_frame().rolls.append(pins)
+            raise GameFinishedException("The game is finished, you cannot make any more rolls.")
+
+    def _game_finished(self):
+        return len([f for f in self._frames if f.is_complete()]) == self.FRAMES_PER_MATCH
 
     def score(self):
         return sum(self._compute_frame_score(frame_index, frame) for frame_index, frame in enumerate(self._frames))

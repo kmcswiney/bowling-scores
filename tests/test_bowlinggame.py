@@ -1,5 +1,5 @@
 from unittest import TestCase
-from bowlingscores import BowlingGame
+from bowlingscores import BowlingGame, GameFinishedException
 
 class TestBowlingGame(TestCase):
 
@@ -88,3 +88,8 @@ class TestBowlingGame(TestCase):
                 (6 + 3)
             )
         )
+
+    def test_ensure_no_rolls_after_game_finished(self):
+        self.roll([4] * 20)
+        with self.assertRaises(GameFinishedException):
+            self.roll([5])

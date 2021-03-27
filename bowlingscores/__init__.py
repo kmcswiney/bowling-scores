@@ -1,1 +1,1 @@
-from bowlingscores.bowlinggame import BowlingGame
+from bowlingscores.bowlinggame import BowlingGame, GameFinishedException
