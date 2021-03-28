@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+class GameFinishedException(ValueError):
+    pass
+
 @dataclass
 class Frame:
 
@@ -22,9 +25,6 @@ class Frame:
     def all_pins_knocked_down(self):
         return self.total_pins() == self.PINS_PER_FRAME
 
-class GameFinishedException(ValueError):
-    pass
-
 class BowlingGame:
 
     FRAMES_PER_MATCH = 10
@@ -37,10 +37,17 @@ class BowlingGame:
             self._apply_roll(pins)
         else:
             raise GameFinishedException("The game is finished, you cannot make any more rolls.")
+
+    def score(self):
+        return sum(
+            self._frame_score(frame_index, frame)
+            for frame_index, frame in enumerate(self._frames[:self.FRAMES_PER_MATCH])
+            if frame.is_complete()
+        )
     
     def _roll_permitted(self):
         return (
-            (not self._completed_ten_frames()) or
+            not self._completed_ten_frames() or
             (self._completed_ten_frames() and self._tenth_frame().is_spare() and len(self._bonus_rolls()) < 1) or
             (self._completed_ten_frames() and self._tenth_frame().is_strike() and len(self._bonus_rolls()) < 2)
         )
@@ -51,13 +58,7 @@ class BowlingGame:
         else:
             self._last_frame().rolls.append(pins)
 
-    def score(self):
-        return sum(self._frame_score(frame_index, frame) for frame_index, frame in enumerate(self._frames[:self.FRAMES_PER_MATCH]))
-
     def _frame_score(self, frame_index, frame):
-        return self._completed_frame_score(frame_index, frame) if frame.is_complete() else 0
-
-    def _completed_frame_score(self, frame_index, frame):
         if frame.is_spare():
             return self._frame_pins_plus_following(frame_index, frame, 1)
         elif frame.is_strike():
@@ -86,7 +87,7 @@ class BowlingGame:
 
     def _bonus_rolls(self):
         """
-        Return the rolls that have occurred since the completion of the tenth frame.
+        Return the rolls that have occurred since the tenth frame.
         """
         return self._rolls_since(9)
 
@@ -94,17 +95,13 @@ class BowlingGame:
         return self._frames[-1]
 
     def _tenth_frame(self):
-        return self._frame_or_none(9)
-
-    def _completed_ten_frames(self):
-        tenth_frame = self._tenth_frame()
-        return tenth_frame is not None and tenth_frame.is_complete()
-
-    def _frame_or_none(self, index):
         try:
-            return self._frames[index]
+            return self._frames[9]
         except IndexError:
             return None
+
+    def _completed_ten_frames(self):
+        return self._tenth_frame() is not None and self._tenth_frame().is_complete()
 
     def _is_first_roll(self):
         return not self._frames
