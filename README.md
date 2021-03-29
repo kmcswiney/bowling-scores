@@ -3,7 +3,7 @@ A simple package that implements a bowling scoring system.
 
 # Usage
 
-Requires Python 3.7 or higher. There are no dependencies outside of the Python stdlib.
+Requires Python 3.7 or higher. There are no dependencies outside of the Python Standard Library.
 
 Can be installed as a package using:
 
